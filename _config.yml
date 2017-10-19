@@ -1,0 +1,14 @@
+# Welcome to Jekyll!
+title: Eye tracking
+email: guilhembarboux@gmail.com
+description: Exploring eye tracking
+baseurl: "/"
+url: ""
+
+# Build settings
+source: ./site
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-livereload
