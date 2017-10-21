@@ -1,0 +1,82 @@
+---
+title: ClmTracker
+layout: clmtracker
+permalink: /clmtracker/1/
+test: true
+---
+<video id="videoel" width="1200" height="900" preload="auto" playsinline autoplay></video>
+<script>
+    var ctracker = new clm.tracker(),
+        vid = document.getElementById('videoel'),
+        ctrack = new clm.tracker(),
+        open = [],
+        result;
+
+    ctrack.init();
+
+    // Webcam
+    webcam(success, success);
+
+    // success
+    function success(stream) {
+        if (vid.hasOwnProperty("srcObject")) {
+            vid.srcObject = stream;
+        } else {
+            vid.src = (window.URL && window.URL.createObjectURL(stream));
+        }
+
+        vid.onloadedmetadata = function () {
+            console.log(arguments);
+        };
+
+        vid.onresize = function () {
+            console.log("resize !");
+        };
+
+        ctrack.start(vid);
+
+        setInterval(display, 10);
+
+        function display() {
+            var pos = ctrack.getCurrentPosition(),
+                eyes = {
+                    right: [pos[23], pos[63], pos[64], pos[25], pos[65], pos[66]],
+                    left: [pos[30], pos[68], pos[67], pos[28], pos[70], pos[69]]
+                };
+
+            if (pos) {
+                if (open.length == 50) {
+                    open.shift();
+                }
+
+                if (open.length < 50) {
+                    open.push((ear(eyes.right) + ear(eyes.left)) / 2);
+                }
+
+                if (open.length == 50) {
+                    var sum = 0;
+                    open.forEach(function(value) {
+                        if (value) {
+                            sum += value;
+                        }
+                    });
+
+                    result = sum/50;
+                    if (result < 0.18) {
+                        console.log("Close eyes");
+                    } else {
+                        console.log("Open eyes");
+                    }
+                }
+            }
+        }
+
+        function ear(points) {
+            return (dist(points[1], points[5]) + dist(points[2], points[4])) / (2 * dist(points[0], points[3]));
+        }
+
+        function dist(p1, p2) {
+            return Math.sqrt(Math.pow(Math.abs(p1[0] - p2[0]), 2) + Math.pow(Math.abs(p1[1] - p2[1]), 2));
+        }
+    }
+</script>
