@@ -6,6 +6,7 @@ baseurl: "/"
 url: ""
 
 # Build settings
+livereload: true
 source: ./site
 markdown: kramdown
 theme: minima
