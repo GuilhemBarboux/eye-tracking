@@ -4,36 +4,56 @@ layout: clmtracker
 permalink: /clmtracker/3/
 test: true
 ---
-<script src="{{site.baseurl}}assets/libs/clmtrackr/models/model_pca_10_mosse.js"></script>
-<video id="video" width="1200" height="900" preload="auto" playsinline autoplay></video>
-<canvas width="1200" height="900" id="canvas"></canvas>
+<script src="{{site.baseurl}}assets/libs/clmtrackr/models/model_spca_20_svm.js"></script>
+<video id="video" width="400" height="300" preload="auto" playsinline autoplay></video>
+<div>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas1"></canvas>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas2"></canvas>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas3"></canvas>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas4"></canvas>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas5"></canvas>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas6"></canvas>
+</div>
 <script>
   var video = document.getElementById('video'),
-      canvas = document.getElementById('canvas');
+      canvas = [],
+      trackers = [];
 
   window.onload = function() {
       webcam(success, success);
   }
 
   function success(stream) {
-      var cc = canvas.getContext('2d');
-      cc.fillStyle = "rgb(200,0,0)";
-
       if (video.hasOwnProperty("srcObject")) {
           video.srcObject = stream;
       } else {
           video.src = (window.URL && window.URL.createObjectURL(stream));
       }
 
-      var ctracker = new clm.tracker();
-      ctracker.init();
-      ctracker.start(video);
+      for (var i = 0; i < 1; i++) {
+          var cc, ctracker;
 
-      draw();
-      function draw() {
-          compatibility.requestAnimationFrame(draw);
-          cc.clearRect(0,0,1200,900);
-          ctracker.draw(canvas);
+          canvas[i] = document.getElementById('canvas' + (i+1));
+
+          cc = canvas[i].getContext('2d');
+          cc.fillStyle = "rgb(200,0,0)";
+
+          ctracker = new clm.tracker(window.pModel);
+          ctracker.init();
+          ctracker.start(video);
+          draw(i);
+      }
+
+      function draw(i) {
+          setTimeout(function() {
+              compatibility.requestAnimationFrame(function() {
+                  draw(i);
+              });
+          }, 100);
+
+          cc = canvas[i].getContext('2d');
+          cc.clearRect(0,0,400,300);
+          ctracker.draw(canvas[i]);
       }
   }
 </script>

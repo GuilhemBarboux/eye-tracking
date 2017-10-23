@@ -5,6 +5,10 @@ description: Exploring eye tracking
 baseurl: "/"
 url: ""
 
+# Files settings
+include:
+  - opencv/1/cv.data
+
 # Build settings
 livereload: true
 source: ./site
