@@ -1,0 +1,67 @@
+---
+title: Detector
+layout: tests
+permalink: /detector/
+test: true
+---
+<script async src='{{site.baseurl}}assets/libs/opencvjs/build/cv.js'></script>
+<script src='{{site.baseurl}}assets/libs/opencvjs/test/dat.gui.js'></script>
+<script src="{{site.baseurl}}assets/libs/clmtrackr/build/clmtrackr.js" type="text/javascript"></script>
+<script src="{{site.baseurl}}assets/scripts/detector.js"></script>
+
+<div>
+  <video style="display: inline-block;" id="video" width="400" height="300" preload="auto" playsinline autoplay></video>
+  <div style="display: inline-block; width: 300px">
+    <div>
+      <button id="btnStart">start</button>
+      <button id="btnStop">stop</button>
+    </div>
+    <div>
+      <label for="">Score : <span id="score"></span></label>
+    </div>
+    <div>
+      <label for="">Convergence : <span id="convergence"></span></label>
+    </div>
+  </div>
+  <canvas style="display: inline-block; border: 2px solid black;" width="400" height="300" id="canvas"></canvas>
+</div>
+
+<script>
+    var video = document.getElementById('video'),
+        canvas = document.getElementById('canvas'),
+        score = document.getElementById('score'),
+        converg = document.getElementById('convergence'),
+        btnStart = document.getElementById('btnStart'),
+        btnStop = document.getElementById('btnStop');
+
+    window.onload = function() {
+        detector.getUserMedia({video : true}, success, console.log);
+    }
+
+    function success(stream) {
+        // Display video
+        if (video.hasOwnProperty("srcObject")) {
+            video.srcObject = stream;
+        } else {
+            video.src = (window.URL && window.URL.createObjectURL(stream));
+        }
+
+        btnStart.addEventListener('click', start);
+        btnStop.addEventListener('click', stop);
+    }
+
+    function start() {
+        detector.start({
+            video: video,
+            canvas: canvas,
+            score: score,
+            convergence: convergence
+        });
+    }
+
+    function stop() {
+        detector.stop(video, canvas);
+    }
+
+
+</script>

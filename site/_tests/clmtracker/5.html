@@ -1,0 +1,101 @@
+---
+title: Eyes track
+layout: clmtracker
+permalink: /clmtracker/5/
+test: true
+---
+<div>
+  <video style="display: inline-block;" id="video" width="400" height="300" preload="auto" playsinline autoplay></video>
+  <div style="display: inline-block; width: 500px">
+    <div>
+      <button onclick="start()">start</button>
+      <button onclick="stop()">stop</button>
+    </div>
+    <div>
+      <label for="">Score : <span id="score"></span></label>
+    </div>
+    <div>
+      <label for="">Convergence : <span id="convergence"></span></label>
+    </div>
+  </div>
+  <canvas style="display: inline-block;" width="400" height="300" id="canvas"></canvas>
+</div>
+<script>
+    var video = document.getElementById('video'),
+        canvas = document.getElementById('canvas'),
+        score = document.getElementById('score'),
+        converg = document.getElementById('convergence'),
+        started = false,
+        scores = [],
+        results = [],
+        ctracker = undefined;
+
+    window.onload = function() {
+        webcam(success, console.log);
+    }
+
+    function start() {
+        started = true;
+        ctracker.start(video);
+
+        // launch listener
+        listener();
+    }
+
+    function stop() {
+        started = false;
+        ctracker.stop();
+    }
+
+    function success(stream) {
+        // Display video
+        if (video.hasOwnProperty("srcObject")) {
+            video.srcObject = stream;
+        } else {
+            video.src = (window.URL && window.URL.createObjectURL(stream));
+        }
+
+        // Start trackr
+        ctracker = new clm.tracker();
+        ctracker.init();
+    }
+
+    function listener() {
+        var currentScore = ctracker.getScore();
+        if (currentScore > 0.5) {
+            draw();
+
+            if (currentScore > 0.58) {
+                add(currentScore);
+            }
+        }
+
+        converg.innerHTML = ctracker.getConvergence();
+        score.innerHTML = currentScore;
+
+        if (started) {
+            compatibility.requestAnimationFrame(listener);
+        }
+    }
+
+    function draw() {
+        canvas.getContext('2d').clearRect(0,0,400,300);
+        ctracker.draw(canvas);
+    }
+
+    function add(score) {
+        scores.push(score);
+        results[score] = ctracker.getCurrentPosition();
+        scores.sort();
+
+        if (scores.length > 10) {
+            var i = scores.shift();
+            delete results[i];
+        }
+
+        var sum = scores.reduce(function(a, b) {
+            return a + b;
+        }, 0);
+        console.log(sum / scores.length);
+    }
+</script>
