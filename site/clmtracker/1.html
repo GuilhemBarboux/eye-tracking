@@ -1,8 +1,8 @@
 ---
-title: ClmTracker eye here
+title: ClmTracker
 layout: clmtracker
-permalink: /clmtracker/2/
-test: true
+permalink: /clmtracker/1/
+test: false
 ---
 <div id="aer1"></div>
 <video id="videoel" width="1200" height="900" preload="auto" playsinline autoplay></video>
@@ -10,8 +10,8 @@ test: true
     var ctracker = new clm.tracker(),
         vid = document.getElementById('videoel'),
         ctrack = new clm.tracker(),
+        open = [],
         aer = document.getElementById('aer1'),
-
         result;
 
     ctrack.init();
@@ -37,22 +37,46 @@ test: true
 
         ctrack.start(vid);
 
-        setInterval(display, 200);
+        setInterval(display, 100);
 
         function display() {
             var pos = ctrack.getCurrentPosition(),
                 eyes = {
-                    right: [pos[23], pos[63], pos[24], pos[64], pos[25], pos[65], pos[26], pos[66]],
-                    left: [pos[30], pos[68], pos[29], pos[67], pos[28], pos[70], pos[31], pos[69]]
+                    right: [pos[23], pos[63], pos[64], pos[25], pos[65], pos[66]],
+                    left: [pos[30], pos[68], pos[67], pos[28], pos[70], pos[69]]
                 };
 
             if (pos) {
-                console.log((ear(eyes.right) + ear(eyes.left)) / 2);
+                if (open.length == 10) {
+                    open.shift();
+                }
+
+                if (open.length < 10) {
+                    open.push((ear(eyes.right) + ear(eyes.left)) / 2);
+                }
+
+                if (open.length == 10) {
+                    var sum = 0;
+                    open.forEach(function(value) {
+                        if (value) {
+                            sum += value;
+                        }
+                    });
+
+                    result = sum/10;
+                    aer.innerHTML = Math.ceil(result * 100) / 100;
+
+                    if (result < 0.17) {
+                        console.log("Close eyes");
+                    } else {
+                        console.log("Open eyes");
+                    }
+                }
             }
         }
 
         function ear(points) {
-            return (dist(points[1], points[7]) + dist(points[3], points[5]) + dist(points[2], points[6])) / (3 * dist(points[0], points[4]));
+            return (dist(points[1], points[5]) + dist(points[2], points[4])) / (2 * dist(points[0], points[3]));
         }
 
         function dist(p1, p2) {

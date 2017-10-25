@@ -43,14 +43,9 @@ test: true
 
             // Perform the actual detection:
             var coords = detector.detect(video, 1);
-            if (coords[0]) {
-                count = 0;
-            } else {
-                count++;
-            }
 
-            if (count > 12) {
-                console.log("close eyes");
+            if (coords[0]) {
+                console.log("EYES !");
             }
         }
     }
